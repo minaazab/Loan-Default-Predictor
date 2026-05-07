@@ -22,7 +22,7 @@ import shap
 
 plt.style.use('seaborn-v0_8-whitegrid')
 BLUE = '#3498db'; RED = '#e74c3c'; GREEN = '#2ecc71'; ORANGE = '#e67e22'
-
+print("done")
 
 
 
@@ -47,6 +47,7 @@ for col in app.select_dtypes(include=[np.number]).columns:
     app[col].fillna(app[col].median(), inplace=True)
 for col in app.select_dtypes(include=['object']).columns:
     app[col].fillna(app[col].mode()[0], inplace=True)
+print("done")
 
 
 
@@ -96,6 +97,7 @@ app = app.merge(bureau_agg, on='SK_ID_CURR', how='left')
 bcols = bureau_agg.columns.drop('SK_ID_CURR').tolist()
 app[bcols] = app[bcols].fillna(0)
 print(f"Created {len(bcols)} bureau features  |  Final shape: {app.shape}")
+print("done")
 
 
 
@@ -114,6 +116,7 @@ X_train, X_val, y_train, y_val = train_test_split(X_temp, y_temp, test_size=0.2,
 print(f"Train : {X_train.shape[0]:,}  ({y_train.mean()*100:.1f}% default)")
 print(f"Val   : {X_val.shape[0]:,}  ({y_val.mean()*100:.1f}% default)  <-- used for threshold tuning only")
 print(f"Test  : {X_test.shape[0]:,}  ({y_test.mean()*100:.1f}% default)  <-- final evaluation")
+print("done")
 
 
 
@@ -157,6 +160,7 @@ model.fit(
     callbacks=[lgb.early_stopping(100, verbose=False), lgb.log_evaluation(-1)]
 )
 print(f"Done. Best iteration: {model.best_iteration_}")
+print("done")
 
 
 
@@ -185,6 +189,7 @@ else:
 best_threshold = float(best_row['t'])
 print(f"Default threshold 0.50 --> recall = {sweep_df[sweep_df.t >= 0.499].iloc[0]['recall']:.3f}")
 print(f"Tuned threshold  {best_threshold:.3f} --> recall = {best_row['recall']:.3f}  (target ≥ 60%)")
+print("done")
 
 
 
@@ -218,6 +223,7 @@ print(f"\n--------------GAINS FROM THRESHOLD TUNING--------------")
 for k in ['Recall','ROC-AUC','Precision','F1']:
     d = r_opt[k] - r_050[k]
     print(f"  {k:<12}: {r_050[k]:.3f} --> {r_opt[k]:.3f}  ({'up' if d>=0 else 'down'}{abs(d):.3f})")
+print("done")
 
 
 
@@ -241,6 +247,7 @@ mean_shap = pd.Series(np.abs(sv).mean(axis=0), index=X_test_imp.columns).sort_va
 print("Top 10 features:")
 for i, (f, v) in enumerate(mean_shap.head(10).items(), 1):
     print(f"  {i:2d}. {f:<40s}  {v:.5f}")
+print("done")
 
 
 
@@ -283,6 +290,7 @@ for label, df in fairness_dfs.items():
     for _, row in df.iterrows():
         flag = '  ⚠️  bias risk' if row['fpr'] > avg_fpr * 1.5 else ''
         print(f"    {row['group']:<26s}  n={row['n']:>6,}  Recall={row['recall']:.3f}  FPR={row['fpr']:.3f}{flag}")
+print("done")
 
 
 
@@ -489,6 +497,7 @@ fig.text(0.5, -0.02,
 plt.tight_layout()
 fig.savefig('fig6_fairness.png', dpi=150, bbox_inches='tight')
 plt.close(); print("Saved fig6_fairness.png")
+print("done")
 
 
 
@@ -510,3 +519,4 @@ print(f"""
   Top predictors (SHAP):""")
 for i, (f, v) in enumerate(mean_shap.head(5).items(), 1):
     print(f"    {i}. {f} ({v:.4f})")
+print("Project Complete")
